@@ -9,6 +9,9 @@ using TodoService;
 
 namespace TodoActors.Actors
 {
+    /// <summary>
+    /// Todo Actor is an at least once delivery actor.
+    /// </summary>
     public class TodoActor : AtLeastOnceDeliveryActor
     {
         //TODO move this to be injected to the constructor, dependency injection etc. 

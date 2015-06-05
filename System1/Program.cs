@@ -21,58 +21,31 @@ namespace System1
     {
         private static void Main()
         {
-            var config = ConfigurationFactory.ParseString(@"
-akka {  
-    log-config-on-start = on
-    stdout-loglevel = INFO
-    loglevel = INFO
-    actor {
-        provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-        
-        debug {  
-          receive = on 
-          autoreceive = on
-          lifecycle = on
-          event-stream = on
-          unhandled = on
-        }
+            var system = ActorSystem.Create("system1");
+            
+            var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
 
-       
-    }
-    remote {
-        helios.tcp {
-		    port = 8080
-		    hostname = localhost
-        }
-    }
-}
-");
-            using (var system = ActorSystem.Create("system1"))
-            {
-                var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
-
-                var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
+            var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
                
-                string input;
+            string input;
 
-                Console.WriteLine("Enter send to send bar or quit to exit.");
+            Console.WriteLine("Enter send to send bar or quit to exit.");
 
-                while ((input = Console.ReadLine()) != null)
+            while ((input = Console.ReadLine()) != null)
+            {
+                var cmd = input;
+                switch (cmd)
                 {
-                   var cmd = input;
-                    switch (cmd)
-                    {
-                        case "quit":
-                            return; // Stop the run thread
-                        case "send":
-                                deliverer.Tell(new Message("bar" + DateTime.Today.ToLongDateString()));
+                    case "quit":
+                        return; // Stop the run thread
+                    case "send":
+                            deliverer.Tell(new Message("bar" + DateTime.Today.ToLongDateString()));
 
-                            break;
-                    }
+                        break;
                 }
-
-                Console.ReadLine();
             }
+
+            Console.ReadLine();
         }
     }
 }

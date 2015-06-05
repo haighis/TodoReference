@@ -20,3 +20,8 @@ Akka Remoting Sample that includes:
 
 Actors
 - TodoActor - Persistent Actor that is At least once delivery
+
+Features
+
+- Remoting
+- Hocon configuration from app.config
