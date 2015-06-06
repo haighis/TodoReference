@@ -21,6 +21,7 @@ namespace TodoService
 
         public void AddTodo(string taskName)
         {
+            // TODO how do we handle duplicates. In theory same old way we always have. 
             _dbContext.Todos.Add(new Todo { TaskName = taskName });
             _dbContext.SaveChanges();
         }

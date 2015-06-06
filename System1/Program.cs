@@ -9,27 +9,34 @@ using System;
 using System.Security.AccessControl;
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.Persistence.SqlServer;
 using TodoActors.Actors;
 using TodoDataModel;
 
 namespace System1
 {
-    /// <summary>
-    /// 
-    /// </summary>
     internal class Program
     {
         private static void Main()
         {
+            // Create Actor system
             var system = ActorSystem.Create("system1");
             
+            // Initialize Sql Persistence
+            SqlServerPersistence.Init(system);
+
+            // TODO investigate file/memory cache based journal. In our use case the file system/memory (distributed memory cache) will always be available
+            // via highly available filesystem (azure cloud service) or distribute memory cache (azure cache)
+
+            // Create Deliver actor
             var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
 
+            // Create Deliverer actor
             var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
                
             string input;
 
-            Console.WriteLine("Enter send to send bar or quit to exit.");
+            Console.WriteLine("Enter send to send the message bar or quit to exit.");
 
             while ((input = Console.ReadLine()) != null)
             {
@@ -39,6 +46,7 @@ namespace System1
                     case "quit":
                         return; // Stop the run thread
                     case "send":
+                            // Send the message bar to the database
                             deliverer.Tell(new Message("bar" + DateTime.Today.ToLongDateString()));
 
                         break;

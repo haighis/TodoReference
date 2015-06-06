@@ -11,6 +11,8 @@ namespace TodoActors.Actors
 {
     /// <summary>
     /// Todo Actor is an at least once delivery actor.
+    /// 
+    /// TODO add business logic for validation of todo business rules. 
     /// </summary>
     public class TodoActor : AtLeastOnceDeliveryActor
     {
@@ -24,24 +26,33 @@ namespace TodoActors.Actors
             this.DeliveryPath = deliveryPath;
         }
 
+        /// <summary>
+        /// Define Persistence Id
+        /// </summary>
         public override string PersistenceId
         {
             get { return "atleastonce-1"; }
         }
 
+        /// <summary>
+        /// Receive Recovers will process messages sent when the Actor restarts. With a durable store such as MS SQL, Cassandra or Postgres
+        /// upon actor restart message will be processed here.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         protected override bool ReceiveRecover(object message)
         {
             if (message is Message)
             {
-                var messageData = ((Message)message).Data;
+                var messageData = message as Message;
                 Console.WriteLine("recovered {0}", messageData);
                 Deliver(DeliveryPath,
                 id =>
                 {
                    // Do we need to insert the records that were missed when the db server went down here? 
                     //_todoService.AddTodo(messageData + "from big boom", "from big boom");
-                    Console.WriteLine("recovered delivery task: {0}, with deliveryId: {1}", messageData, id);
-                    return new Confirmable(id, messageData);
+                    Console.WriteLine("recovered delivery task: {0}, with deliveryId: {1}", messageData.Data, id);
+                    return new Confirmable(id, messageData.Data);
                 });
 
             }
@@ -69,7 +80,7 @@ namespace TodoActors.Actors
                         {
                             Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
                             
-                            // INSERT todo into database 
+                            // INSERT into todo database 
                             _todoService.AddTodo(m.Data);
                             return new Confirmable(id, m.Data);
                         });
