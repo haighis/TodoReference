@@ -11,7 +11,12 @@ namespace TodoDataAccess.DataAccess
         }
 
         public TodoDbContext()
-            : base("Name=TodoReference")     
+            : this("Name=TodoReference")
+        {
+            
+        }
+
+        public TodoDbContext(string connectionstringName) : base(connectionstringName)
         {
             Configuration.LazyLoadingEnabled = true;
             Configuration.ValidateOnSaveEnabled = true;

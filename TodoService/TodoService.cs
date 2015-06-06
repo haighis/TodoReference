@@ -19,6 +19,16 @@ namespace TodoService
             _dbContext = new TodoDbContext();
         }
 
+        public TodoServiceBusinessLogic(TodoDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public TodoServiceBusinessLogic(string connectionStringName)
+        {
+            _dbContext = new TodoDbContext(connectionStringName);
+        }
+
         public void AddTodo(string taskName)
         {
             // TODO how do we handle duplicates. In theory same old way we always have. 

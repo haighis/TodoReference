@@ -17,13 +17,20 @@ namespace TodoActors.Actors
     public class TodoActor : AtLeastOnceDeliveryActor
     {
         //TODO move this to be injected to the constructor, dependency injection etc. 
-        private ITodoServiceBusinessLogic _todoService = new TodoServiceBusinessLogic();
+        private ITodoServiceBusinessLogic _todoService; // = new TodoServiceBusinessLogic();
 
         public ActorPath DeliveryPath { get; private set; }
+
+        public TodoActor(ITodoServiceBusinessLogic todoServiceBusinessLogic, ActorPath deliveryPath)
+            : this(deliveryPath)
+        {
+            _todoService = todoServiceBusinessLogic;
+        }
 
         public TodoActor(ActorPath deliveryPath)
         {
             this.DeliveryPath = deliveryPath;
+            _todoService = new TodoServiceBusinessLogic();
         }
 
         /// <summary>

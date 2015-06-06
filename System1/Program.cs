@@ -46,8 +46,8 @@ namespace System1
                     case "quit":
                         return; // Stop the run thread
                     case "send":
-                            // Send the message bar to the database
-                            deliverer.Tell(new Message("bar" + DateTime.Today.ToLongDateString()));
+                            // Send the message bar to database
+                            deliverer.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
 
                         break;
                 }
