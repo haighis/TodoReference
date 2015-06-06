@@ -88,7 +88,7 @@ namespace TodoActors.Actors
                             Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
                             
                             // INSERT into todo database 
-                            _todoService.AddTodo(m.Data);
+                            _todoService.AddTodo(m.Data,id);
                             return new Confirmable(id, m.Data);
                         });
                 });

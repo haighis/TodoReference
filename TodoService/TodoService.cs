@@ -7,7 +7,7 @@ namespace TodoService
 {
     public interface ITodoServiceBusinessLogic : IDisposable
     {
-        void AddTodo(string taskName);
+        void AddTodo(string taskName, long deliveryId);
     }
 
     public class TodoServiceBusinessLogic : ITodoServiceBusinessLogic
@@ -29,10 +29,10 @@ namespace TodoService
             _dbContext = new TodoDbContext(connectionStringName);
         }
 
-        public void AddTodo(string taskName)
+        public void AddTodo(string taskName, long deliveryId)
         {
             // TODO how do we handle duplicates. In theory same old way we always have. 
-            _dbContext.Todos.Add(new Todo { TaskName = taskName });
+            _dbContext.Todos.Add(new Todo { TaskName = taskName, DeliveryId = deliveryId});
             _dbContext.SaveChanges();
         }
 
