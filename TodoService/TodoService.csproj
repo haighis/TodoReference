@@ -88,6 +88,10 @@
       <Project>{dfad538c-f579-4741-8523-648bd59e41df}</Project>
       <Name>TodoDataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TodoDataModel\TodoDataModel.csproj">
+      <Project>{1de7e86b-3c82-4d59-873b-3ae785130e19}</Project>
+      <Name>TodoDataModel</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

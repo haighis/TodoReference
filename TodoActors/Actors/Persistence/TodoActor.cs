@@ -42,8 +42,9 @@ namespace TodoActors.Actors
         }
 
         /// <summary>
-        /// Receive Recovers will process messages sent when the Actor restarts. With a durable store such as MS SQL, Cassandra or Postgres
-        /// upon actor restart message will be processed here.
+        /// Receive Recovers will process messages sent when the Actor restarts. 
+        /// With a durable store such as MS SQL, Cassandra or Postgres
+        /// upon actor restart messages will be processed here.
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
@@ -52,16 +53,23 @@ namespace TodoActors.Actors
             if (message is Message)
             {
                 var messageData = message as Message;
+                
                 Console.WriteLine("recovered {0}", messageData);
+
                 Deliver(DeliveryPath,
                 id =>
                 {
-                   // Do we need to insert the records that were missed when the db server went down here? 
+                    var snap = base.GetDeliverySnapshot();
+                    foreach (var item in snap.UnconfirmedDeliveries)
+                    {
+                        Console.WriteLine("in these items are unconfirmed" + item.DeliveryId + item.Message);
+                    }
+                    // Do we need to insert the records that were missed when the db server went down here? 
                     //_todoService.AddTodo(messageData + "from big boom", "from big boom");
+
                     Console.WriteLine("recovered delivery task: {0}, with deliveryId: {1}", messageData.Data, id);
                     return new Confirmable(id, messageData.Data);
                 });
-
             }
             else if (message is Confirmation)
             {
@@ -74,8 +82,15 @@ namespace TodoActors.Actors
             return true;
         }
 
+        public override TimeSpan RedeliverInterval
+        {
+            get { return TimeSpan.FromSeconds(3); }
+        }
+
         protected override bool ReceiveCommand(object message)
         {
+            SetReceiveTimeout(TimeSpan.FromSeconds(3));
+
             if (message as string == "boom")
                 throw new Exception("Controlled devastation");
             else if (message is Message)
@@ -83,21 +98,34 @@ namespace TodoActors.Actors
                 Persist(message as Message, m =>
                 {
                     Deliver(DeliveryPath,
-                        id =>
-                        {
-                            Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
-                            
-                            // INSERT into todo database 
-                            _todoService.AddTodo(m.Data,id);
+                    id =>
+                    {
+                        Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
+
+                        // INSERT into todo into database
+                        _todoService.AddTodo(m.Data);
+
+                        //if (isValid)
+                        //{
                             return new Confirmable(id, m.Data);
-                        });
+                        //}
+                        //else
+                        //{
+                        //    throw new Exception("devastation");
+                        //}
+                    });
                 });
             }
             else if (message is Confirmation)
             {
-                Persist(message as Confirmation, m => ConfirmDelivery(m.DeliveryId));
+                var m = message as Confirmation;
+                ConfirmDelivery(m.DeliveryId);
             }
-            else return false;
+            else
+            {
+                return false;
+            }
+
             return true;
         }
     }

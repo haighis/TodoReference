@@ -19,21 +19,49 @@ namespace System1
     {
         private static void Main()
         {
+            #region Persistence
             // Create Actor system
-            var system = ActorSystem.Create("system1");
+            //var system = ActorSystem.Create("system1");
             
-            // Initialize Sql Persistence
-            SqlServerPersistence.Init(system);
+            //// Initialize Sql Persistence
+            //SqlServerPersistence.Init(system);
 
-            // TODO investigate file/memory cache based journal. In our use case the file system/memory (distributed memory cache) will always be available
-            // via highly available filesystem (azure cloud service) or distribute memory cache (azure cache)
+            //// TODO investigate file/memory cache based journal. In our use case the file system/memory (distributed memory cache) will always be available
+            //// via highly available filesystem (azure cloud service) or distribute memory cache (azure cache)
 
-            // Create Deliver actor
-            var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
+            //// Create Deliver actor
+            //var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
 
-            // Create Deliverer actor
-            var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
+            //// Create Deliverer actor
+            //var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
                
+            //string input;
+
+            //Console.WriteLine("Enter send to send the message bar or quit to exit.");
+
+            //while ((input = Console.ReadLine()) != null)
+            //{
+            //    var cmd = input;
+            //    switch (cmd)
+            //    {
+            //        case "quit":
+            //            return; // Stop the run thread
+            //        case "send":
+            //                // Send the message bar to database
+            //                deliverer.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
+
+            //            break;
+            //    }
+            //}
+
+            #endregion
+
+            #region Supervisor Strategy Pattern
+            var system = ActorSystem.Create("system1");
+
+            // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
+            var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+
             string input;
 
             Console.WriteLine("Enter send to send the message bar or quit to exit.");
@@ -46,12 +74,14 @@ namespace System1
                     case "quit":
                         return; // Stop the run thread
                     case "send":
-                            // Send the message bar to database
-                            deliverer.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
+                        // Send the message bar to database
+                        todoCoordinator.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
 
                         break;
                 }
             }
+
+            #endregion
 
             Console.ReadLine();
         }

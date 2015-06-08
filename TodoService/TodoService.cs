@@ -1,13 +1,19 @@
-﻿using Akka.Actor;
+﻿using System.Data.SqlClient;
+using System.Threading;
+using System.Threading.Tasks;
+using Akka.Actor;
 using System;
 using TodoDataAccess.DataAccess;
 using TodoDataAccess.DataModel;
+using TodoDataModel;
 
 namespace TodoService
 {
     public interface ITodoServiceBusinessLogic : IDisposable
     {
-        void AddTodo(string taskName, long deliveryId);
+        Task AddTodoAsync(string taskName);
+
+        void AddTodo(string taskName);
     }
 
     public class TodoServiceBusinessLogic : ITodoServiceBusinessLogic
@@ -29,19 +35,41 @@ namespace TodoService
             _dbContext = new TodoDbContext(connectionStringName);
         }
 
-        public void AddTodo(string taskName, long deliveryId)
+        public void AddTodo(string taskName)
         {
-            // TODO how do we handle duplicates. In theory same old way we always have. 
-            _dbContext.Todos.Add(new Todo { TaskName = taskName, DeliveryId = deliveryId});
-            _dbContext.SaveChanges();
+            try
+            {   
+                // TODO
+                // add validator's for the data to validate date is correct before save. 
+                // If incorrect throw new business exception that validation failed. restart actor with 3 retries.
+                _dbContext.Todos.Add(new Todo { TaskName = taskName });
+                _dbContext.SaveChanges();
+            }
+            catch (SqlException ex)
+            {
+                throw new UnknownTodoException(ex.Message,ex);
+            }
+        }
+
+        public async Task AddTodoAsync(string taskName)
+        {
+             try
+            {
+                _dbContext.Todos.Add(new Todo { TaskName = taskName });
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (SqlException ex)
+            {
+                throw new UnknownTodoException(ex.Message,ex);
+            }
         }
 
         public void Dispose()
         {
-            if (_dbContext != null)
-            {
-                _dbContext.Dispose();
-            }
+            //if (_dbContext != null)
+            //{
+            //    _dbContext.Dispose();
+            //}
         }
     }
 }

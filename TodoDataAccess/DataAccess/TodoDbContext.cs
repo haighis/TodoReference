@@ -1,4 +1,5 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using TodoDataAccess.DataModel;
 
 namespace TodoDataAccess.DataAccess
@@ -18,6 +19,7 @@ namespace TodoDataAccess.DataAccess
 
         public TodoDbContext(string connectionstringName) : base(connectionstringName)
         {
+           // ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 5;
             Configuration.LazyLoadingEnabled = true;
             Configuration.ValidateOnSaveEnabled = true;
             Configuration.AutoDetectChangesEnabled = false;
