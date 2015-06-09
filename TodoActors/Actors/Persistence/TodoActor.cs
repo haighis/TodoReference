@@ -17,7 +17,7 @@ namespace TodoActors.Actors
     public class TodoActor : AtLeastOnceDeliveryActor
     {
         //TODO move this to be injected to the constructor, dependency injection etc. 
-        private ITodoServiceBusinessLogic _todoService; // = new TodoServiceBusinessLogic();
+        private ITodoServiceBusinessLogic _todoService;
 
         public ActorPath DeliveryPath { get; private set; }
 
@@ -59,15 +59,16 @@ namespace TodoActors.Actors
                 Deliver(DeliveryPath,
                 id =>
                 {
-                    var snap = base.GetDeliverySnapshot();
-                    foreach (var item in snap.UnconfirmedDeliveries)
-                    {
-                        Console.WriteLine("in these items are unconfirmed" + item.DeliveryId + item.Message);
-                    }
                     // Do we need to insert the records that were missed when the db server went down here? 
                     //_todoService.AddTodo(messageData + "from big boom", "from big boom");
 
                     Console.WriteLine("recovered delivery task: {0}, with deliveryId: {1}", messageData.Data, id);
+
+                    if (default(long) == id)
+                    {
+                        Console.WriteLine("delivery id is empty");
+                    }
+
                     return new Confirmable(id, messageData.Data);
                 });
             }
@@ -103,16 +104,17 @@ namespace TodoActors.Actors
                         Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
 
                         // INSERT into todo into database
-                        _todoService.AddTodo(m.Data);
+                        var canAdd = _todoService.CanAddTodo(m.Data);
 
-                        //if (isValid)
-                        //{
+                        if (canAdd)
+                        {
                             return new Confirmable(id, m.Data);
-                        //}
-                        //else
-                        //{
-                        //    throw new Exception("devastation");
-                        //}
+                        }
+                        else
+                        {
+                            Self.Tell(new Failure(),Self);
+                            throw new Exception("devastation");
+                        }
                     });
                 });
             }
@@ -128,11 +130,17 @@ namespace TodoActors.Actors
 
             return true;
         }
+
+        protected override void PreRestart(Exception reason, object message)
+        {
+            Console.WriteLine("in PreRestart");
+            Self.Tell(message);
+        }
     }
 
     public class DeliveryActor : UntypedActor
     {
-        bool Confirming = true;
+        private bool Confirming = true;
 
         protected override void OnReceive(object message)
         {
@@ -157,6 +165,12 @@ namespace TodoActors.Actors
                     Console.WriteLine("Ignoring message id: {0} and data: {1}", msg.DeliveryId, msg.Data);
                 }
             }
+        }
+
+        protected override void PreRestart(Exception reason, object message)
+        {
+            Console.WriteLine("in PreRestart");
+            Self.Tell(message);
         }
     }
 }

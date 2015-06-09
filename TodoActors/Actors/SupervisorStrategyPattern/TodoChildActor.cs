@@ -29,6 +29,9 @@ namespace TodoActors.Actors.SupervisorStrategyPattern
         /// PreRestart method that is called when Actor is restarted. Tell ourself the message so that message
         /// is added to the Mailbox on restart. This will allow the message to be resent when the actor 
         /// restarts.
+        /// 
+        /// See for more information: https://petabridge.com/blog/how-actors-recover-from-failure-hierarchy-and-supervision/
+        /// See API for more information: http://api.getakka.net/docs/unstable/html/28D639D8.htm
         /// </summary>
         /// <param name="reason"></param>
         /// <param name="message"></param>

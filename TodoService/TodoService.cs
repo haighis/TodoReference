@@ -14,6 +14,8 @@ namespace TodoService
         Task AddTodoAsync(string taskName);
 
         void AddTodo(string taskName);
+
+        bool CanAddTodo(string taskName);
     }
 
     public class TodoServiceBusinessLogic : ITodoServiceBusinessLogic
@@ -61,6 +63,23 @@ namespace TodoService
             catch (SqlException ex)
             {
                 throw new UnknownTodoException(ex.Message,ex);
+            }
+        }
+
+        public bool CanAddTodo(string taskName)
+        {
+            try
+            {
+                // TODO
+                // add validator's for the data to validate date is correct before save. 
+                // If incorrect throw new business exception that validation failed. restart actor with 3 retries.
+                _dbContext.Todos.Add(new Todo { TaskName = taskName });
+                _dbContext.SaveChanges();
+                return true;
+            }
+            catch (SqlException ex)
+            {
+                throw new UnknownTodoException(ex.Message, ex);
             }
         }
 
