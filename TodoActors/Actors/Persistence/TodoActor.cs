@@ -101,7 +101,7 @@ namespace TodoActors.Actors
                     {
                         Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
 
-                        // INSERT into todo into database
+                        // INSERT todo into MS SQL Server database
                         var canAdd = _todoService.CanAddTodo(m.Data);
 
                         if (canAdd)
