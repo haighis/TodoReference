@@ -90,8 +90,6 @@ namespace TodoActors.Actors
 
         protected override bool ReceiveCommand(object message)
         {
-            SetReceiveTimeout(TimeSpan.FromSeconds(3));
-
             if (message as string == "boom")
                 throw new Exception("Controlled devastation");
             else if (message is Message)
