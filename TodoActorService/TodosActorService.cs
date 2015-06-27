@@ -1,9 +1,12 @@
-﻿using Akka.Actor;
+﻿using System;
+using Akka.Actor;
+using TodoActors.Actors;
 using TodoCommon;
+using TodoDataModel;
 
 namespace TodoActorService
 {
-    //TODO this needs to be refactored to use IActorRef's instead of actor selection
+    //TODO Does this need to be refactored to use IActorRef's instead of actor selection???
     public class TodosActorService
     {
         private readonly ActorSystem _actorSystem;
@@ -15,16 +18,8 @@ namespace TodoActorService
 
         public void SendTodo(string taskName)
         {
-            var test = _actorSystem.ActorSelection(ActorPaths.TodoActorPath);
-
-            test.Tell("print");
-            // restart and recovery
-            test.Tell("boom");
-            test.Tell("print");
-            test.Tell("b");
-            test.Tell("print");
-            test.Tell("c");
-            test.Tell("print");
+            var todoCoordinator = _actorSystem.ActorSelection(ActorPaths.CoordinatorPath); 
+            todoCoordinator.Tell(new Message(taskName));
         }
     }
 }

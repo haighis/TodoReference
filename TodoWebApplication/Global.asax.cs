@@ -13,11 +13,11 @@ using Akka.Routing;
 
 namespace WebApplicationSystem1
 {
-    public class MasterCatalogFactory
+    public class TodoFactory
     {
         public ActorSystem ActorSystem { get; private set; }
 
-        public MasterCatalogFactory(ActorSystem system)
+        public TodoFactory(ActorSystem system)
         {
             ActorSystem = system;
         }
@@ -25,7 +25,7 @@ namespace WebApplicationSystem1
 
     public class WebApiApplication : System.Web.HttpApplication
     {
-        public static MasterCatalogFactory MasterCatalogFactory { get; private set; }
+        public static TodoFactory TodoFactory { get; private set; }
 
         protected void Application_Start()
         {
@@ -56,7 +56,7 @@ akka {
             // Create a client as per documentation - http://getakka.net/docs/Remoting
             var system = ActorSystem.Create("TodoClient", config);
 
-            MasterCatalogFactory = new MasterCatalogFactory(system);
+            TodoFactory = new TodoFactory(system);
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);

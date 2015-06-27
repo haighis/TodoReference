@@ -11,19 +11,9 @@ namespace WebApplicationSystem1.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ActorSystem _system;
-
-        public HomeController()
-        {
-            _system = WebApiApplication.MasterCatalogFactory.ActorSystem;    
-        }
-
         public ActionResult Index()
         {   
             ViewBag.Title = "Home Page";
-
-            var todosActorService = new TodosActorService(_system);
-            todosActorService.SendTodo("task " + DateTime.Now.ToLongDateString() + DateTime.Now.ToLongTimeString());
 
             return View();
         }

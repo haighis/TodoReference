@@ -5,6 +5,9 @@ using TodoService;
 
 namespace TodoActors.Actors.SupervisorStrategyPattern
 {
+    /// <summary>
+    /// Tdo Child Actor for taking on dangerous task of inserting to a database.
+    /// </summary>
     public class TodoChildActor : ReceiveActor
     {
         private ITodoServiceBusinessLogic _todoService;
@@ -16,12 +19,13 @@ namespace TodoActors.Actors.SupervisorStrategyPattern
 
                 _todoService.AddTodo(msg.Data); 
                
-                // this will be changed to a can proceed pattern where we check if the todoo exists and if not then proceed.
+                // Optional Async method to save data
+
+                // Could be changed to a can proceed pattern where we check if the todoo exists and if not then proceed.
 
                 // Call async
                 //_todoService.AddTodoAsync(msg.Data).PipeTo(Self);
                 //_todoService.AddTodoAsync(msg.Data).ContinueWith(t => { }).PipeTo(Self);
-
             });  
         }
 
@@ -30,6 +34,8 @@ namespace TodoActors.Actors.SupervisorStrategyPattern
         /// is added to the Mailbox on restart. This will allow the message to be resent when the actor 
         /// restarts.
         /// 
+        /// Note this actor message will be lost in the case the actor system is restarted (unplanned restart. I.e. service fails)
+        /// 
         /// See for more information: https://petabridge.com/blog/how-actors-recover-from-failure-hierarchy-and-supervision/
         /// See API for more information: http://api.getakka.net/docs/unstable/html/28D639D8.htm
         /// </summary>
@@ -37,7 +43,6 @@ namespace TodoActors.Actors.SupervisorStrategyPattern
         /// <param name="message"></param>
         protected override void PreRestart(Exception reason, object message)
         {
-            Console.WriteLine("in PreRestart");
             Self.Tell(message);
         }
 

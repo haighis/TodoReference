@@ -73,8 +73,9 @@ namespace TodoService
                 // TODO
                 // add validator's for the data to validate date is correct before save. 
                 // If incorrect throw new business exception that validation failed. restart actor with 3 retries.
-                _dbContext.Todos.Add(new Todo { TaskName = taskName });
-                _dbContext.SaveChanges();
+                //_dbContext.Todos.Add(new Todo { TaskName = taskName });
+                //_dbContext.SaveChanges();
+                throw new Exception("devastation");
                 return true;
             }
             catch (SqlException ex)

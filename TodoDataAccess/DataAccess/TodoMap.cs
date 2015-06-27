@@ -12,7 +12,6 @@ namespace TodoDataAccess.DataAccess
             ToTable("Todo");
 
             Property(k => k.TodoId).HasColumnName("TodoId");
-            Property(k => k.DeliveryId).HasColumnName("DeliveryId");
             Property(k => k.TaskName).HasColumnName("TaskName").HasMaxLength(256);
         }
     }

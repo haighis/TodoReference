@@ -88,6 +88,49 @@ namespace TodoActors.Actors
             get { return TimeSpan.FromSeconds(3); }
         }
 
+        //protected override bool ReceiveCommand(object message)
+        //{
+        //    if (message as string == "boom")
+        //        throw new Exception("Controlled devastation");
+        //    else if (message is Message)
+        //    {
+        //        Persist(message as Message, m =>
+        //        {
+        //            Deliver(DeliveryPath,
+        //            id =>
+        //            {
+        //                Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
+
+        //                // INSERT todo into MS SQL Server database
+        //                //var canAdd = _todoService.CanAddTodo(m.Data);
+
+        //                //return false;
+
+        //                //if (canAdd)
+        //                //{
+        //                //    return new Confirmable(id, m.Data);
+        //                //}
+        //                //else
+        //                //{
+        //                //    //Self.Tell(new Failure(),Self);
+        //                //    throw new Exception("devastation");
+        //                //}
+        //            });
+        //        });
+        //    }
+        //    else if (message is Confirmation)
+        //    {
+        //        var m = message as Confirmation;
+        //        ConfirmDelivery(m.DeliveryId);
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+
+        //    return true;
+        //}
+
         protected override bool ReceiveCommand(object message)
         {
             if (message as string == "boom")
@@ -97,43 +140,28 @@ namespace TodoActors.Actors
                 Persist(message as Message, m =>
                 {
                     Deliver(DeliveryPath,
-                    id =>
-                    {
-                        Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
-
-                        // INSERT todo into MS SQL Server database
-                        var canAdd = _todoService.CanAddTodo(m.Data);
-
-                        if (canAdd)
+                        id =>
                         {
+                            Console.WriteLine("sending: {0}, with deliveryId: {1}", m.Data, id);
                             return new Confirmable(id, m.Data);
-                        }
-                        else
-                        {
-                            Self.Tell(new Failure(),Self);
-                            throw new Exception("devastation");
-                        }
-                    });
+                        });
                 });
             }
             else if (message is Confirmation)
             {
-                var m = message as Confirmation;
-                ConfirmDelivery(m.DeliveryId);
+                Persist(message as Confirmation, m => ConfirmDelivery(m.DeliveryId));
             }
-            else
-            {
-                return false;
-            }
-
+            else return false;
             return true;
         }
 
-        protected override void PreRestart(Exception reason, object message)
-        {
-            Console.WriteLine("in PreRestart");
-            Self.Tell(message);
-        }
+
+
+        //protected override void PreRestart(Exception reason, object message)
+        //{
+        //    Console.WriteLine("in PreRestart");
+        //    Self.Tell(message);
+        //}
     }
 
     public class DeliveryActor : UntypedActor
@@ -155,6 +183,7 @@ namespace TodoActors.Actors
                 var msg = message as Confirmable;
                 if (Confirming)
                 {
+                    new TodoServiceBusinessLogic().AddTodo("blah ");
                     Console.WriteLine("Confirming delivery of message id: {0} and data: {1}", msg.DeliveryId, msg.Data);
                     Context.Sender.Tell(new Confirmation(msg.DeliveryId));
                 }
@@ -163,12 +192,6 @@ namespace TodoActors.Actors
                     Console.WriteLine("Ignoring message id: {0} and data: {1}", msg.DeliveryId, msg.Data);
                 }
             }
-        }
-
-        protected override void PreRestart(Exception reason, object message)
-        {
-            Console.WriteLine("in PreRestart");
-            Self.Tell(message);
         }
     }
 }
