@@ -6,50 +6,92 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Security.AccessControl;
 using Akka.Actor;
 using Akka.Configuration;
+using Akka.Persistence.SqlServer;
+using TodoActors.Actors;
+using TodoDataModel;
 
-namespace System2
+namespace System1
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
-            var config = ConfigurationFactory.ParseString(@"
-akka {  
-    log-config-on-start = on
-    stdout-loglevel = DEBUG
-    loglevel = DEBUG
-    actor {
-        provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-        
-        debug {  
-          receive = on 
-          autoreceive = on
-          lifecycle = on
-          event-stream = on
-          unhandled = on
-        }
-    }
-    remote {
-        helios.tcp {
-		    port = 8090
-		    hostname = localhost
-        }
-    }
-}
-");
-            //testing connectivity
-            using (var system = ActorSystem.Create("system2", config))
-            {
-                //get a reference to the remote actor
-                var test = system
-                    .ActorSelection("akka.tcp://system1@localhost:8080/user/someActor");
-                //send a message to the remote actor
-                test.Tell("test from remote ()()()()()()()()()()()()()()()()()()()");
+           // #region Persistence
+           ////  Create Actor system
+           // var system = ActorSystem.Create("system1");
+            
+           // // Initialize Sql Persistence
+           // SqlServerPersistence.Init(system);
 
-                Console.ReadLine();
+           // // TODO investigate file/memory cache based journal. In our use case the file system/memory (distributed memory cache) will always be available
+           // // via highly available filesystem (azure cloud service) or distribute memory cache (azure cache)
+
+           // // Create Deliver actor
+           // var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
+
+           // // Create Deliverer actor
+           // var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
+               
+           // string input;
+
+           // Console.WriteLine("Enter send to send the message bar or quit to exit.");
+
+           // while ((input = Console.ReadLine()) != null)
+           // {
+           //     var cmd = input;
+           //     switch (cmd)
+           //     {
+           //         case "quit":
+           //             return; // Stop the run thread
+           //         case "boom":
+           //             deliverer.Tell("boom");
+           //             break;
+           //         case "start":
+           //             delivery.Tell("start");
+           //             break;
+           //         case "stop":
+           //             delivery.Tell("stop");
+           //             break;
+           //         case "send":
+           //                 // Send the message bar to database
+           //                 deliverer.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
+           //             break;
+           //     }
+           // }
+
+           // #endregion
+
+            #region Supervisor Strategy Pattern
+            var system = ActorSystem.Create("system1");
+
+            // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
+            var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+
+            string input;
+
+            Console.WriteLine("Enter send to send the message bar or quit to exit." + todoCoordinator.Path);
+
+            while ((input = Console.ReadLine()) != null)
+            {
+                var cmd = input;
+                switch (cmd)
+                {
+                    case "quit":
+                        return; // Stop the run thread
+                    case "send":
+                        // Send the message bar to database
+                        todoCoordinator.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
+
+                        break;
+                }
             }
+
+            #endregion
+
+            Console.ReadLine();
         }
     }
 }
