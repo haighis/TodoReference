@@ -127,6 +127,10 @@
       <Project>{ea0e3d43-aefe-4730-95b9-fb8663d0e9b3}</Project>
       <Name>TodoActors</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TodoCommon\TodoCommon.csproj">
+      <Project>{655d54db-e07c-4aac-be9f-068540657979}</Project>
+      <Name>TodoCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TodoDataModel\TodoDataModel.csproj">
       <Project>{1de7e86b-3c82-4d59-873b-3ae785130e19}</Project>
       <Name>TodoDataModel</Name>

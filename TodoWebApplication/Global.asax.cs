@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
@@ -9,6 +10,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Akka.Configuration;
 using Akka.Actor;
+using Akka.Configuration.Hocon;
 using Akka.Routing;
 
 namespace WebApplicationSystem1
@@ -29,31 +31,16 @@ namespace WebApplicationSystem1
 
         protected void Application_Start()
         {
-            var config = ConfigurationFactory.ParseString(@"
-akka {  
-    log-config-on-start = on
-    stdout-loglevel = DEBUG
-    loglevel = DEBUG
-    actor {
-        provider = ""Akka.Remote.RemoteActorRefProvider, Akka.Remote""
-        
-        debug {  
-          receive = on 
-          autoreceive = on
-          lifecycle = on
-          event-stream = on
-          unhandled = on
-        }
-    }
-    remote {
-        helios.tcp {
-		    port = 8090
-		    hostname = localhost
-        }
-    }
-}
-");
-            // Create a client as per documentation - http://getakka.net/docs/Remoting
+            var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
+
+            var _clusterConfig = section.AkkaConfig;
+
+            var config =
+                   ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + 0)
+                   //.WithFallback(ConfigurationFactory.ParseString("akka.cluster.roles = [frontend]"))
+                       .WithFallback(_clusterConfig);
+            
+            // Create a client as per documentation 
             var system = ActorSystem.Create("TodoClient", config);
 
             TodoFactory = new TodoFactory(system);
