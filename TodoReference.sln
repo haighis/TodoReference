@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoSystem", "System1\TodoSystem.csproj", "{BC0F0D48-0731-4256-918C-7EF7C8CC4E5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoSystem", "TodoSystem\TodoSystem.csproj", "{BC0F0D48-0731-4256-918C-7EF7C8CC4E5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoActors", "TodoActors\TodoActors.csproj", "{EA0E3D43-AEFE-4730-95B9-FB8663D0E9B3}"
 EndProject
@@ -19,8 +19,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoDataModel", "TodoDataModel\TodoDataModel.csproj", "{1DE7E86B-3C82-4D59-873B-3AE785130E19}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoDataAccess", "TodoDataAccess\TodoDataAccess.csproj", "{DFAD538C-F579-4741-8523-648BD59E41DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoService", "TodoService\TodoService.csproj", "{1A4664DB-6CC5-4F6F-A1CB-C0B021FC91B8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoActorService", "TodoActorService\TodoActorService.csproj", "{C5F5D766-2FE4-4C29-9794-500B9DBF403E}"
 EndProject
