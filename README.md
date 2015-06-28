@@ -4,7 +4,7 @@
 
 Akka Remoting Sample that includes: 
 
--- Todo Console Application (System1 console application)
+-- Todo Console Application (TodoSystem console application)
 
 -- Todo Web Application (TodoWebApplication web api/mvc web project)
 
@@ -20,8 +20,15 @@ Akka Remoting Sample that includes:
 
 Actors
 - TodoActor - Persistent Actor that is At least once delivery
+- TodoCoordinatorActor and TodoChildActor - Supervisor Strategry Pattern
+
+Todo
+- An actor that can handle back pressure.
+- A DB Communicator actor with db up/down states. Won't send to databaes unless db is in an up state. - http://stackoverflow.com/questions/28387589/how-to-handle-exceptions-within-the-actor-in-akka-net
 
 Features
 
+- Local only actors 
 - Remoting
+- Clustering
 - Hocon configuration from app.config

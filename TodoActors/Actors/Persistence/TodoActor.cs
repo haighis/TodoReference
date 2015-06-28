@@ -183,7 +183,7 @@ namespace TodoActors.Actors
                 var msg = message as Confirmable;
                 if (Confirming)
                 {
-                    new TodoServiceBusinessLogic().AddTodo("blah ");
+                    new TodoServiceBusinessLogic().AddTodo(msg.Data);
                     Console.WriteLine("Confirming delivery of message id: {0} and data: {1}", msg.DeliveryId, msg.Data);
                     Context.Sender.Tell(new Confirmation(msg.DeliveryId));
                 }
