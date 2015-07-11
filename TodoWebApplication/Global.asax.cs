@@ -41,7 +41,7 @@ namespace WebApplicationSystem1
                        .WithFallback(_clusterConfig);
             
             // Create a client as per documentation 
-            var system = ActorSystem.Create("TodoClient", config);
+            var system = ActorSystem.Create("system1", config);
 
             TodoFactory = new TodoFactory(system);
 

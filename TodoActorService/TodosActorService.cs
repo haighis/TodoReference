@@ -1,5 +1,6 @@
 ﻿using System;
 using Akka.Actor;
+using Akka.Routing;
 using TodoActors.Actors;
 using TodoCommon;
 using TodoDataModel;
@@ -18,7 +19,11 @@ namespace TodoActorService
 
         public void SendTodo(string taskName)
         {
-            var todoCoordinator = _actorSystem.ActorSelection(ActorPaths.CoordinatorPath); 
+            // send via actor selection
+            //var todoCoordinator = _actorSystem.ActorSelection(ActorPaths.CoordinatorPath); 
+
+            // Send via gorup router
+            var todoCoordinator = _actorSystem.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todo");
             todoCoordinator.Tell(new Message(taskName));
         }
     }

@@ -160,7 +160,7 @@ namespace System1
             var system = ActorSystem.Create("system1",config);
 
             // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
-            system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+            system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todo");
         }
     }
 }

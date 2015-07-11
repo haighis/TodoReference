@@ -90,7 +90,6 @@
     <Compile Include="Actors\Persistence\TodoActor.cs" />
     <Compile Include="Actors\SupervisorStrategyPattern\TodoChildActor.cs" />
     <Compile Include="Actors\SupervisorStrategyPattern\TodoCoordinatorActor.cs" />
-    <Compile Include="Actors\TodoManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

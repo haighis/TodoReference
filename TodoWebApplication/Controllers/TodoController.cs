@@ -40,7 +40,7 @@ namespace WebApplicationSystem1.Controllers
 
         // POST: Todo/Create
         [HttpPost]
-        public ActionResult Create(TodoViewModel model) // [Bind(Include = "TaskName")]
+        public ActionResult Create(TodoViewModel model)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace WebApplicationSystem1.Controllers
                 
                 return RedirectToAction("Index","Home");
             }
-            catch
+            catch(System.Exception ex)
             {
                 return View();
             }

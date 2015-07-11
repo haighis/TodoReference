@@ -24,7 +24,7 @@ namespace TodoActors.Actors
         {
             Receive<Message>(msg =>
             {
-                var todoChildActor = LookupOrCreateTodoChildActor("todo");
+                var todoChildActor = LookupOrCreateTodoChildActor(Guid.NewGuid().ToString());
                 todoChildActor.Forward(msg);
             });
         }
