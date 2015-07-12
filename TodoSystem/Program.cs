@@ -13,6 +13,7 @@ using Akka.Actor;
 using Akka.Configuration;
 using Akka.Configuration.Hocon;
 using Akka.Persistence.SqlServer;
+using Akka.Routing;
 using TodoActors.Actors;
 using TodoDataModel;
 using TodoCommon;
@@ -146,7 +147,10 @@ namespace System1
 
             var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
             //var todoCoordinator = system.ActorSelection(ActorPaths.CoordinatorPath);
+            
+            //var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todo");
             Console.WriteLine("path " + todoCoordinator.Path);
+
             todoCoordinator.Tell(new Message("test"));
         }
 
@@ -160,7 +164,7 @@ namespace System1
             var system = ActorSystem.Create("system1",config);
 
             // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
-            system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todo");
+            system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
         }
     }
 }
