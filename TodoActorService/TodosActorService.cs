@@ -23,7 +23,9 @@ namespace TodoActorService
             //var todoCoordinator = _actorSystem.ActorSelection(ActorPaths.CoordinatorPath); 
 
             // Send via gorup router
-            var todoCoordinator = _actorSystem.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todo");
+            var todoCoordinator = _actorSystem.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
+            
+            
             todoCoordinator.Tell(new Message(taskName));
         }
     }

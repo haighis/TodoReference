@@ -87,7 +87,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actors\CommandProcessor.cs" />
+    <Compile Include="Actors\IMessageCommand.cs" />
     <Compile Include="Actors\Persistence\TodoActor.cs" />
+    <Compile Include="Actors\RemoteJobActor.cs" />
     <Compile Include="Actors\SupervisorStrategyPattern\TodoChildActor.cs" />
     <Compile Include="Actors\SupervisorStrategyPattern\TodoCoordinatorActor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

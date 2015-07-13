@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using Akka.Actor;
 using TodoActorService;
 using WebApplicationSystem1.Models;
+using TodoDataModel;
 
 namespace WebApplicationSystem1.Controllers
 {
@@ -48,8 +49,13 @@ namespace WebApplicationSystem1.Controllers
                 {
                     var taskName = model.TaskName;
 
-                    var todosActorService = new TodosActorService(_system);
-                    todosActorService.SendTodo(taskName);
+                    //var todosActorService = new TodosActorService(_system);
+
+                    //SystemActors.CommandProcessor.Tell(new Message(taskName));
+
+                    //todoCoordinator.Tell(new Message(taskName));
+                    SystemActors.TodoCoordinator.Tell(new Message(taskName));
+                    //todosActorService.SendTodo(taskName);
                 }
                 
                 return RedirectToAction("Index","Home");

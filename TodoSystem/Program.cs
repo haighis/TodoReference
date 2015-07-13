@@ -143,7 +143,7 @@ namespace System1
             var config =
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + 0)
                         .WithFallback(_clusterConfig);
-            var system = ActorSystem.Create("system1", config);
+            var system = ActorSystem.Create("todosystem", config);
 
             var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
             //var todoCoordinator = system.ActorSelection(ActorPaths.CoordinatorPath);
@@ -161,10 +161,13 @@ namespace System1
             var config =
                 ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + port).WithFallback(_clusterConfig);
 
-            var system = ActorSystem.Create("system1",config);
+            var system = ActorSystem.Create("todosystem",config);
+
+            //Props prop = new Props(new TodoCoordinatorActor());
 
             // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
-            system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+            var actor = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+            Console.WriteLine("path " + actor.Path);
         }
     }
 }

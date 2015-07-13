@@ -12,6 +12,7 @@ using Akka.Configuration;
 using Akka.Actor;
 using Akka.Configuration.Hocon;
 using Akka.Routing;
+using TodoActors.Actors;
 
 namespace WebApplicationSystem1
 {
@@ -41,9 +42,13 @@ namespace WebApplicationSystem1
                        .WithFallback(_clusterConfig);
             
             // Create a client as per documentation 
-            var system = ActorSystem.Create("system1", config);
+            var system = ActorSystem.Create("todosystem", config);
 
             TodoFactory = new TodoFactory(system);
+
+            SystemActors.TodoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
+
+            //SystemActors.CommandProcessor = TodoFactory.ActorSystem.ActorOf(Props.Create(() => new CommandProcessor(router)), "commands");
 
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
