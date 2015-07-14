@@ -24,84 +24,6 @@ namespace System1
 {
     internal class Program
     {
-        //private static void Main()
-        //{
-        //   // #region Persistence
-        //   ////  Create Actor system
-        //   // var system = ActorSystem.Create("system1");
-            
-        //   // // Initialize Sql Persistence
-        //   // SqlServerPersistence.Init(system);
-
-        //   // // TODO investigate file/memory cache based journal. In our use case the file system/memory (distributed memory cache) will always be available
-        //   // // via highly available filesystem (azure cloud service) or distribute memory cache (azure cache)
-
-        //   // // Create Deliver actor
-        //   // var delivery = system.ActorOf(Props.Create(() => new DeliveryActor()), "delivery");
-
-        //   // // Create Deliverer actor
-        //   // var deliverer = system.ActorOf(Props.Create(() => new TodoActor(delivery.Path)));
-               
-        //   // string input;
-
-        //   // Console.WriteLine("Enter send to send the message bar or quit to exit.");
-
-        //   // while ((input = Console.ReadLine()) != null)
-        //   // {
-        //   //     var cmd = input;
-        //   //     switch (cmd)
-        //   //     {
-        //   //         case "quit":
-        //   //             return; // Stop the run thread
-        //   //         case "boom":
-        //   //             deliverer.Tell("boom");
-        //   //             break;
-        //   //         case "start":
-        //   //             delivery.Tell("start");
-        //   //             break;
-        //   //         case "stop":
-        //   //             delivery.Tell("stop");
-        //   //             break;
-        //   //         case "send":
-        //   //                 // Send the message bar to database
-        //   //                 deliverer.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
-        //   //             break;
-        //   //     }
-        //   // }
-
-        //   // #endregion
-
-        //    #region Supervisor Strategy Pattern
-        //    // Remote or Local. For Cluster see below.
-        //    var system = ActorSystem.Create("system1");
-
-        //    // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
-        //    var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
-
-        //    string input;
-
-        //    Console.WriteLine("Enter send to send the message bar or quit to exit." + todoCoordinator.Path);
-
-        //    while ((input = Console.ReadLine()) != null)
-        //    {
-        //        var cmd = input;
-        //        switch (cmd)
-        //        {
-        //            case "quit":
-        //                return; // Stop the run thread
-        //            case "send":
-        //                // Send the message bar to database
-        //                todoCoordinator.Tell(new Message("bar - " + DateTime.Now.ToString("g")));
-
-        //                break;
-        //        }
-        //    }
-
-        //    #endregion
-
-        //    Console.ReadLine();
-        //}
-
         private static void Main(string[] args)
         {
             var section = (AkkaConfigurationSection)ConfigurationManager.GetSection("akka");
@@ -136,6 +58,9 @@ namespace System1
 
         private static Config _clusterConfig;
 
+        //private static ActorSystem system;
+        private static IActorRef todoCoordinator;
+
         /// <summary>
         /// Send to Backend. - Sample only. You wouldn't do this in production. Here an actor system is created each time
         /// this method is called which is an expensive operation.
@@ -146,15 +71,16 @@ namespace System1
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + 0)
                         .WithFallback(_clusterConfig);
 
-            var system = ActorSystem.Create("todosystem", config);
-
             //var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
             //var todoCoordinator = system.ActorSelection(ActorPaths.CoordinatorPath);
             
-            var todoCoordinatorRouter = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
-            Console.WriteLine("path " + todoCoordinatorRouter.Path);
+            //var todoCoordinatorRouter = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
+            //Console.WriteLine("path " + todoCoordinatorRouter.Path);
 
-            todoCoordinatorRouter.Tell(new Message("test", Guid.NewGuid()));
+            if (todoCoordinator != null)
+            {
+                todoCoordinator.Tell(new Message("test", Guid.NewGuid()));
+            }
         }
 
         private static void LaunchBackend(string[] args)
@@ -164,7 +90,9 @@ namespace System1
             var config =
                 ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + port).WithFallback(_clusterConfig);
 
-            var system = ActorSystem.Create("todosystem",config);
+            
+            var    system = ActorSystem.Create("todosystem", config);
+            
 
             //var backendRouter =
             //    system.ActorOf(
@@ -180,14 +108,20 @@ namespace System1
             // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
             //var actor = system.ActorOf(Props.Create( () => new TodoCoordinatorActor()), "todocoordinator");
 
-            var actor = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(
-                new ClusterRouterGroup(new ConsistentHashingGroup("/user/todocoordinator"),
-                        new ClusterRouterGroupSettings(10, true, "program", ImmutableHashSet.Create("/user/todocoordinator"))
-                                            )), "todocoordinator");
+            //if (todoCoordinator == null)
+            //{
+            //    todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(
+            //    new ClusterRouterGroup(new ConsistentHashingGroup("/user/todocoordinator"),
+            //            new ClusterRouterGroupSettings(10, true, "program", ImmutableHashSet.Create("/user/todocoordinator"))
+            //                                )), "todocoordinator");
+            //}
             
-            Console.WriteLine("path " + actor.Path);
+            //Console.WriteLine("path " + actor.Path);
 
-            //var todoCoordinatorRouter = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
+            if (todoCoordinator == null)
+            {
+                todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");    
+            }
         }
     }
 }
