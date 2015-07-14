@@ -6,10 +6,12 @@
 //-----------------------------------------------------------------------
 
 using System;
+using System.Collections.Immutable;
 using System.Configuration;
 using System.Security.AccessControl;
 using System.Threading;
 using Akka.Actor;
+using Akka.Cluster.Routing;
 using Akka.Configuration;
 using Akka.Configuration.Hocon;
 using Akka.Persistence.SqlServer;
@@ -143,15 +145,16 @@ namespace System1
             var config =
                     ConfigurationFactory.ParseString("akka.remote.helios.tcp.port=" + 0)
                         .WithFallback(_clusterConfig);
+
             var system = ActorSystem.Create("todosystem", config);
 
-            var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+            //var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
             //var todoCoordinator = system.ActorSelection(ActorPaths.CoordinatorPath);
             
-            //var todoCoordinator = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todo");
-            Console.WriteLine("path " + todoCoordinator.Path);
+            var todoCoordinatorRouter = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
+            Console.WriteLine("path " + todoCoordinatorRouter.Path);
 
-            todoCoordinator.Tell(new Message("test"));
+            todoCoordinatorRouter.Tell(new Message("test", Guid.NewGuid()));
         }
 
         private static void LaunchBackend(string[] args)
@@ -163,11 +166,28 @@ namespace System1
 
             var system = ActorSystem.Create("todosystem",config);
 
+            //var backendRouter =
+            //    system.ActorOf(
+            //        Props.Empty.WithRouter(
+            //        new ClusterRouterGroup(new ConsistentHashingGroup("/user/backend"),
+            //            new ClusterRouterGroupSettings(10, false, "backend", ImmutableHashSet.Create("/user/backend"))
+            //                                )
+            //                               )
+            //            );
+
             //Props prop = new Props(new TodoCoordinatorActor());
 
             // Create Coordinator Actor that will supervise risky child (Character Actor) actor's
-            var actor = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()), "todocoordinator");
+            //var actor = system.ActorOf(Props.Create( () => new TodoCoordinatorActor()), "todocoordinator");
+
+            var actor = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(
+                new ClusterRouterGroup(new ConsistentHashingGroup("/user/todocoordinator"),
+                        new ClusterRouterGroupSettings(10, true, "program", ImmutableHashSet.Create("/user/todocoordinator"))
+                                            )), "todocoordinator");
+            
             Console.WriteLine("path " + actor.Path);
+
+            //var todoCoordinatorRouter = system.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
         }
     }
 }

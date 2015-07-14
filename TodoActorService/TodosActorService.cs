@@ -26,7 +26,7 @@ namespace TodoActorService
             var todoCoordinator = _actorSystem.ActorOf(Props.Create(() => new TodoCoordinatorActor()).WithRouter(FromConfig.Instance), "todogroup");
             
             
-            todoCoordinator.Tell(new Message(taskName));
+            todoCoordinator.Tell(new Message(taskName, Guid.NewGuid()));
         }
     }
 }
